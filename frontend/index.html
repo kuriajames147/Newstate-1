@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refer & Earn - Kenya's Best Referral Program</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Hero Section -->
+    <div class="text-center mb-8">
+      <h1 class="text-5xl font-bold text-green-600 mb-2">Refer & Earn</h1>
+      <p class="text-gray-600 text-lg">Earn Ksh 100 for every friend you refer!</p>
+    </div>
+
+    <div class="max-w-md mx-auto">
+      <!-- Auth Card -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white text-center">
+          <i class="fas fa-users text-5xl mb-3"></i>
+          <h2 class="text-2xl font-bold">Join the Community</h2>
+          <p class="text-green-100 mt-1">Start earning today!</p>
+        </div>
+
+        <div class="p-6">
+          <!-- Tabs -->
+          <div class="flex gap-2 mb-6 bg-gray-100 rounded-lg p-1">
+            <button id="loginTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all bg-green-600 text-white">
+              Login
+            </button>
+            <button id="registerTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all text-gray-600">
+              Register
+            </button>
+          </div>
+
+          <!-- Login Form -->
+          <div id="loginForm">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 mb-2">Email Address</label>
+                <input type="email" id="loginEmail" placeholder="you@example.com" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <button id="loginBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+              </button>
+            </div>
+          </div>
+
+          <!-- Register Form -->
+          <div id="registerForm" class="hidden">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 mb-2">Username</label>
+                <input type="text" id="regUsername" placeholder="johndoe" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Email Address</label>
+                <input type="email" id="regEmail" placeholder="you@example.com" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Phone Number</label>
+                <input type="tel" id="regPhone" placeholder="0712345678" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p class="text-xs text-gray-500 mt-1">Kenyan number (07XXXXXXXX or 2547XXXXXXXX)</p>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Password</label>
+                <input type="password" id="regPassword" placeholder="••••••••" 
+                       class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <button id="registerBtn" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 rounded-lg transition-all">
+                <i class="fas fa-user-plus mr-2"></i>Register
+              </button>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center gap-2 text-green-700 mb-2">
+              <i class="fas fa-gift"></i>
+              <span class="font-semibold">How it works:</span>
+            </div>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>✓ Register for free</li>
+              <li>✓ Pay Ksh 200 activation fee</li>
+              <li>✓ Get your unique referral link</li>
+              <li>✓ Share with friends</li>
+              <li>✓ Earn Ksh 100 per successful referral</li>
+              <li>✓ Withdraw earnings from Ksh 300</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API Configuration
+    const API_BASE = 'http://localhost:5000/api';
+    
+    // Helper Functions
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      } text-white`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function getToken() {
+      return localStorage.getItem('token');
+    }
+    
+    function setToken(token) {
+      localStorage.setItem('token', token);
+    }
+    
+    // Get referral code from URL
+    function getReferralCode() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('ref');
+    }
+    
+    // Tab Switching
+    function switchTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginTab = document.getElementById('loginTabBtn');
+      const registerTab = document.getElementById('registerTabBtn');
+      
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginTab.classList.add('bg-green-600', 'text-white');
+        loginTab.classList.remove('text-gray-600');
+        registerTab.classList.remove('bg-green-600', 'text-white');
+        registerTab.classList.add('text-gray-600');
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        registerTab.classList.add('bg-green-600', 'text-white');
+        registerTab.classList.remove('text-gray-600');
+        loginTab.classList.remove('bg-green-600', 'text-white');
+        loginTab.classList.add('text-gray-600');
+      }
+    }
+    
+    // Handle Login
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      
+      if (!email || !password) {
+        showToast('Please fill all fields', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showToast('Login successful!');
+          
+          if (data.user.registration_paid === false) {
+            window.location.href = 'activation.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } else {
+          showToast(data.error, 'error');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showToast('Login failed. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Login';
+      }
+    }
+    
+    // Handle Register
+    async function handleRegister() {
+      const username = document.getElementById('regUsername').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const password = document.getElementById('regPassword').value;
+      const referral_code = getReferralCode();
+      
+      const btn = document.getElementById('registerBtn');
+      
+      if (!username || !email || !phone || !password) {
+        showToast('Please fill all fields', 'error');
+        return;
+      }
+      
+      const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
+      if (!phoneRegex.test(phone)) {
+        showToast('Please enter a valid Kenyan phone number', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+      
+      try {
+        const requestBody = { username, email, phone, password };
+        if (referral_code) {
+          requestBody.referral_code = referral_code;
+        }
+        
+        const response = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showToast('Registration successful! Please activate your account.');
+          window.location.href = 'activation.html';
+        } else {
+          showToast(data.error, 'error');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        showToast('Registration failed. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Register';
+      }
+    }
+    
+    // Initialize event listeners when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab buttons
+      document.getElementById('loginTabBtn').onclick = () => switchTab('login');
+      document.getElementById('registerTabBtn').onclick = () => switchTab('register');
+      
+      // Form buttons
+      document.getElementById('loginBtn').onclick = handleLogin;
+      document.getElementById('registerBtn').onclick = handleRegister;
+      
+      // Show registration form if referral code is present
+      const refCode = getReferralCode();
+      if (refCode) {
+        switchTab('register');
+        showToast('You were referred by a friend! Complete registration to join.', 'success');
+      }
+    });
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

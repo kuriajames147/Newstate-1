@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Refer & Earn</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    <!-- Admin Sidebar -->
+    <div class="w-64 bg-gray-900 text-white fixed h-full">
+      <div class="p-6 border-b border-gray-800">
+        <h2 class="text-xl font-bold">Admin Panel</h2>
+        <p class="text-gray-400 text-sm">Referral System</p>
+      </div>
+      <nav class="p-4">
+        <a href="#" onclick="showAdminSection('dashboard')" class="nav-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-all mb-1">
+          <i class="fas fa-chart-line"></i><span>Dashboard</span>
+        </a>
+        <a href="#" onclick="showAdminSection('users')" class="nav-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-all mb-1">
+          <i class="fas fa-users"></i><span>Users</span>
+        </a>
+        <a href="#" onclick="showAdminSection('withdrawals')" class="nav-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-all mb-1">
+          <i class="fas fa-money-bill-wave"></i><span>Withdrawals</span>
+        </a>
+        <a href="#" onclick="showAdminSection('transactions')" class="nav-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-all mb-1">
+          <i class="fas fa-exchange-alt"></i><span>Transactions</span>
+        </a>
+        <a href="#" onclick="showAdminSection('referrals')" class="nav-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-all mb-1">
+          <i class="fas fa-link"></i><span>Referrals</span>
+        </a>
+        <hr class="my-4 border-gray-800">
+        <a href="#" onclick="logout()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-red-600 transition-all">
+          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64">
+      <div class="bg-white shadow-sm p-6">
+        <h1 class="text-2xl font-bold text-gray-800" id="adminSectionTitle">Dashboard</h1>
+      </div>
+      <div class="p-6" id="adminContent"></div>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
