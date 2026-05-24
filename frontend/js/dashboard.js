@@ -97,97 +97,63 @@ async function loadWalletBalance() {
   }
 }
 async function loadReferralStats() {
-  try {
-    const response = await fetch(`${API_BASE}/referrals/stats`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
-    console.log('Referral data:', data);
-    
-    if (data.success) {
-      // Update referral link
-      const referralLinkInput = document.getElementById('referralLink');
-      if (referralLinkInput) {
-        const referralLink = `${window.location.origin}/index.html?ref=${data.referralCode}`;
-        referralLinkInput.value = referralLink;
-      }
-      
-      // Update counts
-      const pendingCountEl = document.getElementById('pendingCount');
-      const completedCountEl = document.getElementById('completedCount');
-      const totalReferralsEl = document.getElementById('totalReferrals');
-      const totalEarningsEl = document.getElementById('totalEarnings');
-      
-      if (pendingCountEl) pendingCountEl.textContent = data.totalPending || 0;
-      if (completedCountEl) completedCountEl.textContent = data.totalCompleted || 0;
-      if (totalReferralsEl) totalReferralsEl.textContent = data.totalCompleted || 0;
-      if (totalEarningsEl) totalEarningsEl.textContent = formatMoney(data.totalEarned);
-      
-      // Update referrals table
-      const tbody = document.getElementById('referralsTable');
-      if (!tbody) {
-        console.warn('referralsTable element not found in HTML');
-        return;
-      }
-      
-      tbody.innerHTML = '';
-      
-      // Show pending referrals
-      if (data.pending && data.pending.length > 0) {
-        data.pending.forEach(ref => {
-          tbody.innerHTML += `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="px-4 py-3">${ref.username || 'N/A'}</td>
-              <td class="px-4 py-3">${ref.email || '-'}</td>
-              <td class="px-4 py-3">
-                <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
-                  Pending Payment
-                </span>
-              </td>
-              <td class="px-4 py-3">-</td>
-              <td class="px-4 py-3 text-sm">${formatDate(ref.created_at)}</td>
-            </tr>
-          `;
+    try {
+        const response = await fetch(`${API_BASE}/referrals/stats`, {
+            headers: { 'Authorization': `Bearer ${getToken()}` }
         });
-      }
-      
-      // Show completed referrals
-      if (data.completed && data.completed.length > 0) {
-        data.completed.forEach(ref => {
-          tbody.innerHTML += `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="px-4 py-3">${ref.username || 'N/A'}</td>
-              <td class="px-4 py-3">${ref.email || '-'}</td>
-              <td class="px-4 py-3">
-                <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-                  Completed
-                </span>
-              </td>
-              <td class="px-4 py-3 font-semibold text-green-600">${formatMoney(ref.commission)}</td>
-              <td class="px-4 py-3 text-sm">${formatDate(ref.payment_date)}</td>
-            </tr>
-          `;
-        });
-      }
-      
-      // Show message if no referrals
-      if ((!data.pending || data.pending.length === 0) && 
-          (!data.completed || data.completed.length === 0)) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="text-center py-8 text-gray-500">
-              No referrals yet. Share your referral link to start earning!
-            </td>
-          </tr>
-        `;
-      }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update counts
+            document.getElementById('pendingCount').textContent = data.totalPending || 0;
+            document.getElementById('completedCount').textContent = data.totalCompleted || 0;
+            document.getElementById('totalReferrals').textContent = data.totalReferrals || 0;
+            document.getElementById('totalEarnings').innerHTML = `Ksh ${data.totalEarned || 0}`;
+            
+            // Update referral link
+            const referralLink = `${window.location.origin}/index.html?ref=${data.referralCode}`;
+            document.getElementById('referralLink').value = referralLink;
+            
+            // Update referrals table
+            const tbody = document.getElementById('referralsTable');
+            if (tbody) {
+                tbody.innerHTML = '';
+                
+                // Pending referrals
+                data.pending.forEach(ref => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="px-4 py-2">${ref.username}</td>
+                            <td class="px-4 py-2">${ref.email || '-'}</td>
+                            <td class="px-4 py-2">
+                                <span class="text-yellow-600">Pending Payment</span>
+                            </td>
+                            <td class="px-4 py-2">-</td>
+                            <td class="px-4 py-2">${new Date(ref.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Completed referrals
+                data.completed.forEach(ref => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="px-4 py-2">${ref.username}</td>
+                            <td class="px-4 py-2">${ref.email || '-'}</td>
+                            <td class="px-4 py-2">
+                                <span class="text-green-600">Completed</span>
+                            </td>
+                            <td class="px-4 py-2">Ksh ${ref.commission}</td>
+                            <td class="px-4 py-2">${new Date(ref.payment_date).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading referrals:', error);
     }
-  } catch (error) {
-    console.error('Referral stats error:', error);
-  }
 }
 
 async function loadTransactions() {

@@ -113,28 +113,27 @@
     // IMMEDIATE REFERRAL CODE CAPTURE (CRITICAL)
     // This must run BEFORE anything else
     // ============================================
-    (function captureReferralCode() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const referralCode = urlParams.get('ref');
+      (function() {
+    console.log('🔍 Page loaded - checking URL for referral code...');
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCode = urlParams.get('ref');
+    
+    if (referralCode && referralCode !== 'null' && referralCode !== 'undefined' && referralCode.trim() !== '') {
+      sessionStorage.setItem('referral_code', referralCode.trim());
+      console.log('✅ Referral code captured and stored:', referralCode);
       
-      console.log('🔍 Page loaded - Referral code in URL:', referralCode);
-      
-      if (referralCode && referralCode !== 'null' && referralCode !== 'undefined' && referralCode.trim() !== '') {
-        sessionStorage.setItem('referral_code', referralCode.trim());
-        console.log('✅ Referral code saved to sessionStorage:', referralCode.trim());
-        
-        // Show a nice message to referred users
-        setTimeout(() => {
-          const message = document.createElement('div');
-          message.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-          message.innerHTML = '<i class="fas fa-gift mr-2"></i>You were referred by a friend! Complete registration to join.';
-          document.body.appendChild(message);
-          setTimeout(() => message.remove(), 5000);
-        }, 1000);
-      } else {
-        console.log('ℹ️ No referral code found in URL');
-      }
-    })();
+      // Show a welcome message
+      setTimeout(function() {
+        var msg = document.createElement('div');
+        msg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        msg.innerHTML = '<i class="fas fa-gift mr-2"></i>You were referred by a friend! Complete registration to join.';
+        document.body.appendChild(msg);
+        setTimeout(function() { msg.remove(); }, 5000);
+      }, 1000);
+    } else {
+      console.log('ℹ️ No referral code found in URL');
+    }
+  })();
 
     // ============================================
     // API CONFIGURATION
@@ -349,5 +348,6 @@
       }
     });
   </script>
+  <script src="js/auth.js"></script>
 </body>
 </html>

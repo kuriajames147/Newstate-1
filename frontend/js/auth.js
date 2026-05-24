@@ -1,7 +1,10 @@
 // frontend/js/auth.js
 const API_BASE = 'http://localhost:5000/api';
 
-// Helper functions
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
 function getToken() {
   return localStorage.getItem('token');
 }
@@ -20,6 +23,10 @@ function showToast(message, type = 'success') {
   setTimeout(() => toast.remove(), 3000);
 }
 
+// ============================================
+// REFERRAL CODE MANAGEMENT
+// ============================================
+
 // Get referral code from sessionStorage (set by index.html)
 function getReferralCode() {
   const code = sessionStorage.getItem('referral_code');
@@ -33,7 +40,34 @@ function clearReferralCode() {
   console.log('🗑️ Referral code cleared from sessionStorage');
 }
 
-// Switch between login and register tabs
+// Store referral code (called from index.html)
+function storeReferralCode(code) {
+  if (code && code !== 'null' && code !== 'undefined' && code.trim() !== '') {
+    sessionStorage.setItem('referral_code', code.trim());
+    console.log('✅ Referral code stored:', code.trim());
+    return true;
+  }
+  console.log('ℹ️ No valid referral code to store');
+  return false;
+}
+
+// Check if there's a referral code in the URL (for debugging)
+function checkUrlForReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref) {
+    console.log('🔍 Referral code found in URL:', ref);
+    storeReferralCode(ref);
+    return ref;
+  }
+  console.log('ℹ️ No referral code in URL');
+  return null;
+}
+
+// ============================================
+// TAB SWITCHING
+// ============================================
+
 function switchTab(tab) {
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
@@ -54,10 +88,83 @@ function switchTab(tab) {
     registerTab.classList.remove('text-gray-600');
     loginTab.classList.remove('bg-green-600', 'text-white');
     loginTab.classList.add('text-gray-600');
+    
+    // Show referral message if user was referred
+    const refCode = sessionStorage.getItem('referral_code');
+    if (refCode) {
+      setTimeout(() => {
+        showToast('🎉 You were referred by a friend! Complete registration to join.', 'success');
+      }, 500);
+    }
   }
 }
+   // ============================================
+// REGISTER HANDLER - WITH REFERRAL CODE
+// ============================================
 
-// Handle Login
+async function handleRegister() {
+  const referral_code = sessionStorage.getItem('referral_code');
+  
+    const username = document.getElementById('regUsername').value;
+    const email = document.getElementById('regEmail').value;
+    const phone = document.getElementById('regPhone').value;
+    const password = document.getElementById('regPassword').value;
+    
+    
+    
+    const btn = document.getElementById('registerBtn');
+    
+    if (!username || !email || !phone || !password) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+    
+    const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
+    if (!phoneRegex.test(phone)) {
+        showToast('Please enter a valid Kenyan phone number', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+    
+    try {
+        const requestBody = { username, email, phone, password };
+        if (referral_code && referral_code !== 'null') {
+            requestBody.referral_code = referral_code;
+        }
+        
+        const response = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            setToken(data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            sessionStorage.removeItem('referral_code');
+            showToast(data.message);
+            window.location.href = 'activation.html';
+        } else {
+            // Show the specific error from backend
+            showToast(data.error, 'error');
+            console.error('Registration error:', data.error);
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        showToast('Registration failed. Please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Register';
+    }
+}
+// ============================================
+// LOGIN HANDLER
+// ============================================
+
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -102,81 +209,47 @@ async function handleLogin() {
   }
 }
 
-// Handle Register - THIS IS WHERE REFERRAL CODE IS SENT
-async function handleRegister() {
-  const username = document.getElementById('regUsername').value;
-  const email = document.getElementById('regEmail').value;
-  const phone = document.getElementById('regPhone').value;
-  const password = document.getElementById('regPassword').value;
-  
-  // Get referral code from sessionStorage
-  const referral_code = getReferralCode();
-  
+
+
+// ============================================
+// TEST FUNCTION - Check if referral system is working
+// ============================================
+
+function testReferralSystem() {
   console.log('========================================');
-  console.log('📝 REGISTRATION WITH REFERRAL');
-  console.log('Username:', username);
-  console.log('Email:', email);
-  console.log('Phone:', phone);
-  console.log('Referral code from session:', referral_code);
+  console.log('🧪 TESTING REFERRAL SYSTEM');
   console.log('========================================');
-  
-  const btn = document.getElementById('registerBtn');
-  
-  if (!username || !email || !phone || !password) {
-    showToast('Please fill all fields', 'error');
-    return;
-  }
-  
-  const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
-  if (!phoneRegex.test(phone)) {
-    showToast('Please enter a valid Kenyan phone number', 'error');
-    return;
-  }
-  
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
-  
-  try {
-    const requestBody = { username, email, phone, password };
-    
-    // Only add referral_code if it exists and is valid
-    if (referral_code && referral_code !== 'null' && referral_code !== 'undefined' && referral_code.trim() !== '') {
-      requestBody.referral_code = referral_code.trim();
-      console.log('✅ Adding referral_code to request:', requestBody.referral_code);
-    } else {
-      console.log('ℹ️ No referral code - first time user');
-    }
-    
-    const response = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
-    });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      setToken(data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Clear referral code after successful registration
-      clearReferralCode();
-      
-      showToast(data.message);
-      window.location.href = 'activation.html';
-    } else {
-      showToast(data.error, 'error');
-    }
-  } catch (error) {
-    console.error('Registration error:', error);
-    showToast('Registration failed. Please try again.', 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Register';
-  }
+  console.log('Current URL:', window.location.href);
+  console.log('URL params:', window.location.search);
+  console.log('sessionStorage referral_code:', sessionStorage.getItem('referral_code'));
+  console.log('localStorage token:', localStorage.getItem('token') ? 'Present' : 'Missing');
+  console.log('========================================');
 }
 
-// Make functions global
+// ============================================
+// INITIALIZATION - Runs when script loads
+// ============================================
+
+// Run immediately when script loads
+(function init() {
+  console.log('🔧 Auth.js initializing...');
+  checkUrlForReferral();
+  testReferralSystem();
+})();
+
+// Also check when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('📄 DOM fully loaded, checking for referral code again...');
+  checkUrlForReferral();
+});
+
+// ============================================
+// EXPOSE FUNCTIONS FOR GLOBAL ACCESS
+// ============================================
+
 window.switchTab = switchTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
+window.checkUrlForReferral = checkUrlForReferral;
+window.storeReferralCode = storeReferralCode;
+window.testReferralSystem = testReferralSystem;
