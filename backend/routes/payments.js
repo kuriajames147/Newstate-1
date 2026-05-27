@@ -36,7 +36,7 @@ router.post('/activate', authenticate, async (req, res) => {
     }
 });
 
-// M-PESA Callback - Credits referrer with commission
+// M-PESA Callback - Creates referral AND credits commission AFTER payment
 router.post('/callback', async (req, res) => {
     console.log('\n📞 M-PESA Callback received');
     
@@ -71,7 +71,8 @@ router.post('/callback', async (req, res) => {
                 );
 
                 // ============================================
-                // CREDIT REFERRER - FIXED: using referred_by_code
+                // CREATE REFERRAL RECORD AND CREDIT COMMISSION
+                // This happens ONLY AFTER payment
                 // ============================================
                 const userResult = await pool.query(
                     `SELECT referred_by_code FROM users WHERE id = $1`,
@@ -90,24 +91,26 @@ router.post('/callback', async (req, res) => {
                     if (referrerResult.rows.length > 0) {
                         const referrerId = referrerResult.rows[0].id;
 
-                        // Credit Ksh 120
+                        // CREATE the referral record (now completed)
+                        await pool.query(
+                            `INSERT INTO referrals (referrer_id, referred_id, status, commission, payment_status, payment_date) 
+                             VALUES ($1, $2, 'completed', 120.00, 'completed', NOW())`,
+                            [referrerId, userId]
+                        );
+
+                        // Update referrer's count
+                        await pool.query(
+                            `UPDATE users SET referral_count = referral_count + 1 WHERE id = $1`,
+                            [referrerId]
+                        );
+
+                        // Credit referrer with Ksh 120
                         await pool.query(
                             `UPDATE users 
                              SET wallet_balance = wallet_balance + 120,
                                  total_earnings = total_earnings + 120
                              WHERE id = $1`,
                             [referrerId]
-                        );
-
-                        // Update referral record to completed
-                        await pool.query(
-                            `UPDATE referrals 
-                             SET status = 'completed', 
-                                 commission = 120,
-                                 payment_status = 'completed',
-                                 payment_date = NOW()
-                             WHERE referrer_id = $1 AND referred_id = $2`,
-                            [referrerId, userId]
                         );
 
                         // Record earnings
@@ -117,7 +120,7 @@ router.post('/callback', async (req, res) => {
                             [referrerId, referrerId, userId]
                         );
 
-                        console.log(`💰 Commission of Ksh 120 credited to user ${referrerId}`);
+                        console.log(`✅ Referral created and commission credited: Ksh 120 to user ${referrerId}`);
                     }
                 }
             }
