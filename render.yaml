@@ -1,0 +1,52 @@
+# render.yaml
+services:
+  # Backend API Service
+  - type: web
+    name: referral-backend
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: referral-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_SHORTCODE
+        value: 174379
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_CALLBACK_URL
+        sync: false
+
+  # Frontend Static Site
+  - type: static
+    name: referral-frontend
+    runtime: static
+    buildCommand: echo "Static site ready"
+    staticPublishPath: ./frontend
+    envVars:
+      - key: VITE_API_URL
+        value: https://referral-backend.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # PostgreSQL Database
+  - type: postgresql
+    name: referral-db
+    plan: free
+    ipAllowList: []
+    databaseName: referral_db
+    postgresMajorVersion: 15
