@@ -123,8 +123,6 @@ router.get('/withdrawals', authenticate, async (req, res) => {
 // AUTOMATED WITHDRAWAL (No Admin Approval)
 // ============================================
 
-// backend/routes/wallet.js - Corrected withdrawal function
-
 router.post('/withdraw', authenticate, async (req, res) => {
   const { amount } = req.body;
   const userId = req.user.id;
@@ -215,14 +213,14 @@ router.post('/withdraw', authenticate, async (req, res) => {
           [b2cResult.conversationId, b2cResult.originatorConversationId, withdrawalId]
         );
         
-        // Update transaction
+        // FIXED: Removed ORDER BY from UPDATE statement
         await pool.query(
           `UPDATE transactions 
            SET status = 'completed',
                description = $1,
                mpesa_receipt = $2
            WHERE user_id = $3 AND type = 'withdrawal' AND status = 'processing'
-           ORDER BY created_at DESC LIMIT 1`,
+           LIMIT 1`,
           [`Withdrawal of Ksh ${amount} sent to ${userPhone}. Ref: ${b2cResult.conversationId}`, 
            b2cResult.conversationId, userId]
         );
@@ -259,12 +257,13 @@ router.post('/withdraw', authenticate, async (req, res) => {
          WHERE id = $2`,
         [b2cError.message, withdrawalId]
       );
+      // FIXED: Removed ORDER BY from UPDATE statement
       await pool.query(
         `UPDATE transactions 
          SET status = 'failed', 
              description = 'Withdrawal failed - amount refunded'
          WHERE user_id = $1 AND type = 'withdrawal' AND status = 'processing'
-         ORDER BY created_at DESC LIMIT 1`,
+         LIMIT 1`,
         [userId]
       );
       await pool.query('COMMIT');
@@ -328,12 +327,13 @@ router.post('/withdraw/cancel/:withdrawalId', authenticate, async (req, res) => 
       [withdrawalId]
     );
     
+    // FIXED: Removed ORDER BY from UPDATE statement
     await pool.query(
       `UPDATE transactions 
        SET status = 'cancelled', 
            description = 'Withdrawal cancelled by user'
        WHERE user_id = $1 AND type = 'withdrawal' AND status IN ('processing', 'pending')
-       ORDER BY created_at DESC LIMIT 1`,
+       LIMIT 1`,
       [userId]
     );
     

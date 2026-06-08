@@ -9,8 +9,144 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ============================================ */
-        /* HAMBURGER MENU STYLES - WORKING VERSION */
-        /* ============================================ */
+/* DARK MODE CSS VARIABLES - Add at the top of your style section */
+/* ============================================ */
+
+/* Light mode (default) */
+:root {
+    --bg-primary: #f3f4f6;
+    --bg-secondary: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --header-bg: #ffffff;
+    --sidebar-bg-start: #065f46;
+    --sidebar-bg-end: #047857;
+    --sidebar-text: #ffffff;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --table-header-bg: #f9fafb;
+    --table-row-hover: #f9fafb;
+}
+
+/* Dark mode */
+.dark {
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+    --card-bg: #1f2937;
+    --header-bg: #1f2937;
+    --sidebar-bg-start: #022c22;
+    --sidebar-bg-end: #064e3b;
+    --sidebar-text: #e5e7eb;
+    --input-bg: #374151;
+    --input-border: #4b5563;
+    --table-header-bg: #374151;
+    --table-row-hover: #374151;
+}
+
+/* Apply theme variables to body */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card backgrounds */
+.bg-white, .bg-white.rounded-xl, .bg-white.shadow-sm {
+    background-color: var(--card-bg) !important;
+}
+
+.bg-gray-50, .bg-gray-100 {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Text colors */
+.text-gray-800, .text-gray-700, .text-gray-600 {
+    color: var(--text-primary) !important;
+}
+
+.text-gray-500, .text-gray-400 {
+    color: var(--text-secondary) !important;
+}
+
+/* Border colors */
+.border, .border-b, .border-gray-200, .border-gray-100, .border-gray-300 {
+    border-color: var(--border-color) !important;
+}
+
+/* Sidebar */
+.sidebar {
+    background: linear-gradient(135deg, var(--sidebar-bg-start), var(--sidebar-bg-end)) !important;
+}
+
+/* Header */
+.bg-white.shadow-sm {
+    background-color: var(--header-bg) !important;
+}
+
+/* Input fields */
+input, select, textarea {
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--text-primary) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #10b981 !important;
+    outline: none !important;
+}
+
+/* Table styling */
+table thead tr {
+    background-color: var(--table-header-bg) !important;
+}
+
+table tbody tr {
+    border-bottom-color: var(--border-color) !important;
+}
+
+table tbody tr:hover {
+    background-color: var(--table-row-hover) !important;
+}
+
+/* Green text in dark mode */
+.text-green-600, .text-green-500 {
+    color: #34d399 !important;
+}
+
+/* Blue text in dark mode */
+.text-blue-600, .text-blue-500 {
+    color: #60a5fa !important;
+}
+
+/* Purple text in dark mode */
+.text-purple-600, .text-purple-500 {
+    color: #a78bfa !important;
+}
+
+/* Orange text in dark mode */
+.text-orange-600, .text-orange-500 {
+    color: #fbbf24 !important;
+}
+
+/* Welcome banner dark mode */
+.dark .welcome-banner {
+    background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+}
+
+.dark .welcome-banner .text-yellow-800,
+.dark .welcome-banner .text-yellow-900 {
+    color: #fcd34d !important;
+}
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
         
         /* Mobile menu button */
         .mobile-menu-btn {
@@ -179,9 +315,214 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+        }
+        /* Referral link card gradient */
+        .referral-card {
+            background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .referral-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #059669;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- ============================================ -->
+<!-- FLOATING CONTACT BUTTONS (WhatsApp & Email) -->
+<!-- ============================================ -->
+<style>
+    /* Floating buttons container */
+    .floating-buttons {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    /* Individual floating button */
+    .floating-btn {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+    }
+    
+    .floating-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* WhatsApp button specific */
+    .whatsapp-btn {
+        background-color: #25D366;
+        color: white;
+    }
+    
+    .whatsapp-btn:hover {
+        background-color: #128C7E;
+    }
+    
+    /* Email button specific */
+    .email-btn {
+        background-color: #EA4335;
+        color: white;
+    }
+    
+    .email-btn:hover {
+        background-color: #C5221F;
+    }
+    
+    /* Tooltip for buttons */
+    .floating-btn {
+        position: relative;
+    }
+    
+    .floating-btn .tooltip {
+        position: absolute;
+        right: 70px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .floating-btn:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Pulse animation for attention */
+    @keyframes pulse-green {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+        50% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+    }
+    
+    @keyframes pulse-red {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.7); }
+        50% { box-shadow: 0 0 0 15px rgba(234, 67, 53, 0); }
+    }
+    
+    .whatsapp-btn {
+        animation: pulse-green 2s infinite;
+    }
+    
+    .email-btn {
+        animation: pulse-red 2s infinite;
+    }
+    
+    /* Mobile adjustment */
+    @media (max-width: 768px) {
+        .floating-buttons {
+            bottom: 16px;
+            right: 16px;
+            gap: 8px;
+        }
+        
+        .floating-btn {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .floating-btn i {
+            font-size: 20px;
+        }
+    }
+</style>
+
+<!-- Floating Buttons Container -->
+<div class="floating-buttons">
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/254752100668?text=Hello%21%20I%20need%20assistance%20with%20my%20Refer%20%26%20Earn%20account" 
+       target="_blank" 
+       class="floating-btn whatsapp-btn"
+       id="whatsappBtn">
+        <i class="fab fa-whatsapp fa-2x"></i>
+        <span class="tooltip">Chat with us on WhatsApp</span>
+    </a>
+    
+    <!-- Email Button -->
+    <a href="mailto:newstatehela@gmail.com?subject=Customer%20Support%20Request&body=Hello%2C%20I%20need%20assistance%20with..." 
+       class="floating-btn email-btn"
+       id="emailBtn">
+        <i class="fas fa-envelope fa-2x"></i>
+        <span class="tooltip">Email our support team</span>
+    </a>
+</div>
+
+<script>
+    // ============================================
+    // CONTACT BUTTONS CONFIGURATION
+    // Update these values with your actual contact info
+    // ============================================
+    
+    // WhatsApp Configuration
+    // Format: https://wa.me/COUNTRY_CODE_PHONE_NUMBER
+    const WHATSAPP_NUMBER = '254752100668';  // Replace with your actual WhatsApp number
+    const WHATSAPP_MESSAGE = 'Hello! I need assistance with ';
+    
+    // Email Configuration
+    const COMPANY_EMAIL = 'newstatehela@gmail.com';  // Replace with your actual email
+    const EMAIL_SUBJECT = 'Customer Support Request';
+    const EMAIL_BODY = 'Hello, I need assistance with the following issue:\n\n';
+    
+    // Update WhatsApp link dynamically
+    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+    document.getElementById('whatsappBtn').href = whatsappLink;
+    
+    // Optional: Track button clicks for analytics
+    document.getElementById('whatsappBtn').addEventListener('click', function() {
+        console.log('WhatsApp button clicked');
+        // You can add analytics tracking here
+    });
+    
+    document.getElementById('emailBtn').addEventListener('click', function() {
+        console.log('Email button clicked');
+        // You can add analytics tracking here
+    });
+</script>
 
 <!-- Mobile Menu Button -->
 <button class="mobile-menu-btn" id="menuToggle">
@@ -236,55 +577,61 @@
 <!-- Main Content -->
 <div class="main-content-area">
     <!-- Header -->
-    <div class="bg-white shadow-sm p-4">
-        <div class="flex items-center justify-between">
-            <h1 class="text-xl md:text-2xl font-bold text-gray-800" id="sectionTitle">Dashboard Overview</h1>
+     
+  <div class="bg-white shadow-sm p-4">
+    <div class="flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800" id="sectionTitle">Dashboard Overview</h1>
+        
+        <div class="flex items-center gap-2 md:gap-3">
+            <!-- Theme Toggle Button - NOW NEXT TO NOTIFICATION BELL -->
+            <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 transition-all">
+                <i id="themeIcon" class="fas fa-moon text-gray-600 text-xl"></i>
+            </button>
             
-            <div class="flex items-center gap-2 md:gap-3">
-                <!-- Notification Icon -->
-                <div class="relative">
-                    <button id="notificationBtn" class="relative p-2 rounded-lg hover:bg-gray-100 transition-all">
-                        <i class="fas fa-bell text-gray-600 text-lg md:text-xl"></i>
-                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                    
-                    <div id="notificationDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl hidden z-50">
-                        <div class="p-3 border-b">
-                            <h4 class="font-semibold text-gray-800">Notifications</h4>
-                        </div>
-                        <div id="notificationList" class="max-h-96 overflow-y-auto">
-                            <div class="p-4 text-center text-gray-500">No new notifications</div>
-                        </div>
-                        <div class="p-2 border-t">
-                            <button onclick="clearAllNotifications()" class="text-sm text-green-600 hover:text-green-700 w-full text-center py-1">Clear all</button>
-                        </div>
+            <!-- Notification Icon -->
+            <div class="relative">
+                <button id="notificationBtn" class="relative p-2 rounded-lg hover:bg-gray-100 transition-all">
+                    <i class="fas fa-bell text-gray-600 text-lg md:text-xl"></i>
+                    <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </button>
+                
+                <div id="notificationDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl hidden z-50">
+                    <div class="p-3 border-b">
+                        <h4 class="font-semibold text-gray-800">Notifications</h4>
+                    </div>
+                    <div id="notificationList" class="max-h-96 overflow-y-auto">
+                        <div class="p-4 text-center text-gray-500">No new notifications</div>
+                    </div>
+                    <div class="p-2 border-t">
+                        <button onclick="clearAllNotifications()" class="text-sm text-green-600 hover:text-green-700 w-full text-center py-1">Clear all</button>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Profile Icon -->
+            <div class="relative">
+                <button id="profileBtn" class="flex items-center gap-1 md:gap-2 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                    <i class="fas fa-user-circle text-gray-600 text-2xl md:text-3xl"></i>
+                    <i class="fas fa-chevron-down text-gray-600 text-xs"></i>
+                </button>
                 
-                <!-- Profile Icon -->
-                <div class="relative">
-                    <button id="profileBtn" class="flex items-center gap-1 md:gap-2 p-2 rounded-lg hover:bg-gray-100 transition-all">
-                        <i class="fas fa-user-circle text-gray-600 text-2xl md:text-3xl"></i>
-                        <i class="fas fa-chevron-down text-gray-600 text-xs"></i>
-                    </button>
-                    
-                    <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl hidden z-50">
-                        <a href="#" onclick="showProfileSettings()" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-t-lg">
-                            <i class="fas fa-user w-5"></i><span>Profile Settings</span>
-                        </a>
-                        <a href="#" onclick="showAccountSettings()" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50">
-                            <i class="fas fa-cog w-5"></i><span>Account Settings</span>
-                        </a>
-                        <hr class="my-1">
-                        <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-50 rounded-b-lg">
-                            <i class="fas fa-sign-out-alt w-5"></i><span>Logout</span>
-                        </a>                      
-                    </div>
+                <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl hidden z-50">
+                    <a href="profile-settings.html" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-t-lg">
+                        <i class="fas fa-user w-5"></i><span>Profile Settings</span>
+                    </a>
+                    <a href="account-settings.html" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-cog w-5"></i><span>Account Settings</span>
+                    </a>
+                    <hr class="my-1">
+                    <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-50 rounded-b-lg">
+                        <i class="fas fa-sign-out-alt w-5"></i><span>Logout</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
+    
     <div class="p-4 md:p-6">
         <!-- Overview Section -->
         <div id="overviewSection">
@@ -329,7 +676,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Referral Link Card -->
             <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-4 md:p-6 mb-6 md:mb-8 text-white">
                 <h3 class="text-lg md:text-xl font-bold mb-3"><i class="fas fa-link mr-2"></i>Your Referral Link</h3>
@@ -362,7 +709,7 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- Other sections (simplified for brevity) -->
         <div id="referralsSection" class="hidden">
             <div class="bg-white rounded-xl shadow-sm p-4 md:p-6">
@@ -410,12 +757,43 @@
     </footer>
     </div>
 </div>
-<script src="js/config.js"></script>
 <script>
     // API Configuration
     var API_BASE = 'http://localhost:5000/api';
-    const API_URL = API_BASE;
     
+    // ============================================
+// DARK/LIGHT MODE FUNCTIONS
+// ============================================
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const icon = document.getElementById('themeIcon');
+    
+    if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        if (icon) icon.className = 'fas fa-sun text-yellow-500 text-xl';
+    } else {
+        document.documentElement.classList.remove('dark');
+        if (icon) icon.className = 'fas fa-moon text-gray-600 text-xl';
+    }
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('themeIcon');
+    
+    if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        if (icon) icon.className = 'fas fa-moon text-gray-600 text-xl';
+        if (typeof showToast === 'function') showToast('Light mode activated', 'success');
+    } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        if (icon) icon.className = 'fas fa-sun text-yellow-500 text-xl';
+        if (typeof showToast === 'function') showToast('Dark mode activated', 'success');
+    }
+}
     // ============================================
     // HAMBURGER MENU FUNCTIONS - WORKING
     // ============================================
@@ -531,8 +909,6 @@
     
     function clearAllNotifications() { notifications = []; updateNotificationBadge(); renderNotifications(); }
     function formatTimeAgo(date) { var s = Math.floor((new Date() - date) / 1000); if (s < 60) return 'Just now'; var m = Math.floor(s / 60); if (m < 60) return m + 'm ago'; var h = Math.floor(m / 60); if (h < 24) return h + 'h ago'; return Math.floor(h / 24) + 'd ago'; }
-    function showProfileSettings() { showToast('Profile settings coming soon', 'info'); }
-    function showAccountSettings() { showToast('Account settings coming soon', 'info'); }
     
     function toggleNotificationDropdown() {
         var d = document.getElementById('notificationDropdown');
@@ -574,7 +950,14 @@
         loadDashboard();
         setTimeout(function() { if (user.username) addNotification('Welcome back, ' + user.username + '!', 'success'); }, 1000);
     });
+    document.addEventListener('DOMContentLoaded', function() {
+    initTheme();
     
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+});
     document.addEventListener('click', function(e) {
         var nd = document.getElementById('notificationDropdown');
         var pd = document.getElementById('profileDropdown');
@@ -592,6 +975,7 @@
     window.showProfileSettings = showProfileSettings;
     window.showAccountSettings = showAccountSettings;
     window.closeSidebarOnMobile = closeSidebarOnMobile;
+    
 </script>
 
 <script src="js/dashboard.js"></script>

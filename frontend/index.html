@@ -6,187 +6,226 @@
     <title>Refer & Earn - Kenya's Best Referral Program</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Background with overlay for better readability */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        /* Floating animation for cards */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .auth-card {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Toast animation */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Input focus effects */
+        .input-focus-effect:focus {
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+        
+        /* Pulse animation for CTA button */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .cta-button:hover {
+            animation: pulse 0.5s ease;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 min-h-screen">
+<body class="hero-bg">
 
-<!-- ============================================ -->
-<!-- REFERRAL CAPTURE - MUST BE FIRST SCRIPT      -->
-<!-- ============================================ -->
+<!-- IMMEDIATE REFERRAL CAPTURE - MUST BE FIRST -->
 <script>
-    // CRITICAL: This runs immediately and captures referral code from URL
     (function() {
-        console.log('========================================');
-        console.log(' REFERRAL CAPTURE ACTIVE');
-        console.log('========================================');
-        console.log('Current full URL:', window.location.href);
-        console.log('URL path:', window.location.pathname);
-        console.log('URL search params:', window.location.search);
-
-        // Get the 'ref' parameter
+        console.log('🔍 Page loaded - checking URL for referral code...');
         const urlParams = new URLSearchParams(window.location.search);
         const referralCode = urlParams.get('ref');
-
-        console.log('Extracted referral code:', referralCode);
-
+        
         if (referralCode && referralCode !== 'null' && referralCode !== 'undefined' && referralCode.trim() !== '') {
-            // Store in sessionStorage
             sessionStorage.setItem('referral_code', referralCode.trim());
-            console.log(' REFERRAL CODE CAPTURED AND STORED:', referralCode);
-
-            // Also store in a global variable as a fallback
-            window.referralCode = referralCode.trim();
+            console.log('✅ Referral code captured and stored:', referralCode);
+            
+            // Show a welcome message for referred users
+            setTimeout(function() {
+                var msg = document.createElement('div');
+                msg.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+                msg.innerHTML = '<i class="fas fa-gift mr-2"></i>You were referred by a friend! Complete registration to join.';
+                document.body.appendChild(msg);
+                setTimeout(function() { msg.remove(); }, 5000);
+            }, 1000);
         } else {
-            console.log(' No referral code found in URL');
-            console.log('   To test, visit: http://localhost:3000/index.html?ref=YOUR_CODE');
+            console.log('ℹ️ No referral code found in URL');
         }
-
-        console.log('SessionStorage referral_code:', sessionStorage.getItem('referral_code'));
-        console.log('========================================');
     })();
 </script>
 
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white text-center">
-                <i class="fas fa-users text-5xl mb-3"></i>
-                <h2 class="text-2xl font-bold">Join the Community</h2>
-                <p class="text-green-100 mt-1">Start earning today!</p>
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <!-- Logo/Brand -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur rounded-2xl mb-3">
+                <i class="fas fa-chart-line text-4xl text-white"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-1">NewstateHela</h1>
+            <p class="text-white/80 text-lg">Welcome to NewstateHela your digitized financial platform</p>
+        </div>
+        
+        <!-- Auth Card -->
+        <div class="auth-card bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 p-5 text-white text-center">
+                <i class="fas fa-users text-4xl mb-2"></i>
+                <h2 class="text-xl font-bold">Join the Community</h2>
+                <p class="text-green-100 text-sm">Start earning today!</p>
             </div>
 
             <div class="p-6">
+                <!-- Tabs -->
                 <div class="flex gap-2 mb-6 bg-gray-100 rounded-lg p-1">
-                    <button id="loginTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all text-gray-600">Login</button>
-                    <button id="registerTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all text-gray-600">Register</button>
+                    <button id="loginTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all bg-green-600 text-white">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                    <button id="registerTabBtn" class="flex-1 py-2 rounded-lg font-semibold transition-all text-gray-600">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </button>
                 </div>
 
                 <!-- Login Form -->
-                <div id="loginForm" class="hidden">
+                <div id="loginForm">
                     <div class="space-y-4">
-                        <input type="email" id="loginEmail" placeholder="Email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <input type="password" id="loginPassword" placeholder="Password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <button id="loginBtn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">Login</button>
+                        <div>
+                            <label class="block text-gray-700 mb-2 font-medium">Email Address</label>
+                            <input type="email" id="loginEmail" placeholder="you@example.com" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 font-medium">Password</label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                        </div>
+                        <button id="loginBtn" class="cta-button w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </button>
                     </div>
                 </div>
 
                 <!-- Register Form -->
                 <div id="registerForm" class="hidden">
-                    <div class="space-y-4">
-                        <input type="text" id="regUsername" placeholder="Username" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <input type="email" id="regEmail" placeholder="Email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <input type="tel" id="regPhone" placeholder="Phone (0712345678)" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <input type="password" id="regPassword" placeholder="Password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
-
-                        <!-- REFERRAL CODE FIELD - Auto-filled from URL ?ref= param -->
+                    <div class="space-y-3">
                         <div>
-                            <label class="block text-gray-700 mb-2 font-semibold">
-                                <i class="fas fa-gift text-green-600 mr-1"></i>
-                                Referral Code
-                            </label>
-                            <input type="text" id="regReferralCode"
-                                   placeholder="Enter referral code if you have one"
-                                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-                                   value="">
-                            <p class="text-xs text-gray-500 mt-1" id="referralMessage">
-                                Enter a referral code if you have one to credit your referrer!
-                            </p>
+                            <input type="text" id="regUsername" placeholder="Username" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
                         </div>
-
-                        <button id="registerBtn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">Register</button>
+                        <div>
+                            <input type="email" id="regEmail" placeholder="Email Address" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                        </div>
+                        <div>
+                            <input type="tel" id="regPhone" placeholder="Phone Number (e.g., 0712345678)" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                        </div>
+                        <div>
+                            <input type="password" id="regPassword" placeholder="Password" 
+                                   class="input-focus-effect w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3">
+                            <label class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="fas fa-gift text-green-600"></i>
+                                <span>Have a referral code?</span>
+                                <input type="text" id="regReferralCode" placeholder="Enter code" 
+                                       class="flex-1 ml-2 px-3 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-sm">
+                            </label>
+                        </div>
+                        <button id="registerBtn" class="cta-button w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 rounded-lg transition-all">
+                            <i class="fas fa-user-plus mr-2"></i>Register
+                        </button>
                     </div>
                 </div>
+
+                <!-- Info Box -->
+                <div class="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                    <div class="flex items-center gap-2 text-green-700 mb-2">
+                        <i class="fas fa-gift"></i>
+                        <span class="font-semibold">How it works:</span>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Register for free</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Pay Ksh 300 activation fee</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Get your unique referral link</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Share with friends</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Earn Ksh 120 per successful referral</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 text-xs"></i> Withdraw earnings from Ksh 300</li>
+                    </ul>
+                </div>
             </div>
+        </div>
+        
+        <!-- Footer Text -->
+        <div class="text-center mt-6 text-white/70 text-sm">
+            <i class="fas fa-shield-alt mr-1"></i> Secure Referral System
         </div>
     </div>
 </div>
 
 <script>
     const API_BASE = 'http://localhost:5000/api';
-
-    // ============================================
-    // HELPER: Get the best available token
-    // ============================================
+    
+    // Helper functions
     function getToken() { return localStorage.getItem('token'); }
     function setToken(token) { localStorage.setItem('token', token); }
-
-    // ============================================
-    // AUTO-FILL REFERRAL CODE FIELD
-    // Called whenever the register tab becomes visible
-    // ============================================
-    function autoFillReferralCode() {
-        const referralInput = document.getElementById('regReferralCode');
-        const referralMessage = document.getElementById('referralMessage');
-
-        if (!referralInput) {
-            console.warn('autoFillReferralCode: #regReferralCode not found in DOM yet');
-            return;
-        }
-
-        // Priority 1: sessionStorage (set by capture script at page load)
-        // Priority 2: global window variable (fallback)
-        let referralCode = sessionStorage.getItem('referral_code') || window.referralCode || '';
-
-        console.log('autoFillReferralCode — resolved code:', referralCode);
-
-        if (referralCode && referralCode !== 'null' && referralCode !== 'undefined' && referralCode.trim() !== '') {
-            referralInput.value = referralCode.trim();
-            referralInput.style.backgroundColor = '#d1fae5';  // Light green bg
-            referralInput.style.borderColor = '#10b981';       // Green border
-            referralInput.style.fontWeight = '500';
-
-            referralMessage.innerHTML = '<i class="fas fa-check-circle text-green-600 mr-1"></i>Referral code automatically applied! You were referred by a friend.';
-            referralMessage.className = 'text-xs text-green-600 mt-1 font-semibold';
-
-            console.log(' Referral code auto-filled:', referralCode);
-        } else {
-            // Reset styles in case user navigates back and forth
-            referralInput.style.backgroundColor = '#ffffff';
-            referralInput.style.borderColor = '#d1d5db';
-            referralInput.style.fontWeight = '';
-
-            referralMessage.innerHTML = 'Enter a referral code if you have one to credit your referrer!';
-            referralMessage.className = 'text-xs text-gray-500 mt-1';
-
-            console.log('ℹ No referral code to auto-fill');
-        }
-    }
-
-    // ============================================
-    // GET REFERRAL CODE (for submission)
-    // Prefers the input field value; falls back to sessionStorage
-    // ============================================
-    function getReferralCode() {
-        const referralInput = document.getElementById('regReferralCode');
-        const inputVal = referralInput?.value?.trim();
-        if (inputVal && inputVal !== '') return inputVal;
-        return sessionStorage.getItem('referral_code')?.trim() || '';
-    }
-
-    // ============================================
-    // TOAST NOTIFICATION
-    // ============================================
+    
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
-        toast.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-50 text-white transition-opacity duration-300 ${
-            type === 'error' ? 'bg-red-500' : 'bg-green-500'
-        }`;
-        toast.innerHTML = message;
+        toast.className = `toast ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-lg shadow-lg`;
+        toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>${message}`;
         document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
     }
-
-    // ============================================
-    // TAB SWITCHER
-    // ============================================
+    
+    // Get referral code from sessionStorage
+    function getStoredReferralCode() {
+        return sessionStorage.getItem('referral_code');
+    }
+    
+    function clearStoredReferralCode() {
+        sessionStorage.removeItem('referral_code');
+    }
+    
+    // Tab switching
     function switchTab(tab) {
-        const loginForm    = document.getElementById('loginForm');
+        const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        const loginTab     = document.getElementById('loginTabBtn');
-        const registerTab  = document.getElementById('registerTabBtn');
-
+        const loginTab = document.getElementById('loginTabBtn');
+        const registerTab = document.getElementById('registerTabBtn');
+        
         if (tab === 'login') {
             loginForm.classList.remove('hidden');
             registerForm.classList.add('hidden');
@@ -201,179 +240,132 @@
             registerTab.classList.remove('text-gray-600');
             loginTab.classList.remove('bg-green-600', 'text-white');
             loginTab.classList.add('text-gray-600');
-
-            // CRITICAL: Auto-fill referral field every time register tab is shown
-            autoFillReferralCode();
+            
+            // Show referral message if user was referred
+            const refCode = getStoredReferralCode();
+            if (refCode) {
+                setTimeout(() => {
+                    showToast('🎉 You were referred by a friend! Complete registration to join.', 'success');
+                }, 500);
+            }
         }
     }
-
-    // ============================================
-    // LOGIN HANDLER
-    // ============================================
+    
+    // Handle Login
     async function handleLogin() {
-        const email    = document.getElementById('loginEmail').value.trim();
+        const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-        const btn      = document.getElementById('loginBtn');
-
+        const btn = document.getElementById('loginBtn');
+        
         if (!email || !password) {
-            showToast('Please enter your email and password', 'error');
+            showToast('Please fill all fields', 'error');
             return;
         }
-
-        btn.disabled   = true;
-        btn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
-
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+        
         try {
             const response = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
+            
             const data = await response.json();
-
+            
             if (data.success) {
                 setToken(data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                showToast('Login successful! Redirecting...');
-                setTimeout(() => {
-                    window.location.href = data.user.registration_paid ? 'dashboard.html' : 'activation.html';
-                }, 1000);
+                showToast('Login successful!');
+                
+                if (data.user.registration_paid === false) {
+                    window.location.href = 'activation.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             } else {
-                showToast(data.error || 'Login failed', 'error');
+                showToast(data.error, 'error');
             }
         } catch (error) {
             console.error('Login error:', error);
-            showToast('Login failed. Please check your connection.', 'error');
+            showToast('Login failed. Please try again.', 'error');
         } finally {
-            btn.disabled  = false;
-            btn.innerHTML = 'Login';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Login';
         }
     }
-
-    // ============================================
-    // REGISTER HANDLER
-    // ============================================
+    
+    // Handle Register
     async function handleRegister() {
-        const username      = document.getElementById('regUsername').value.trim();
-        const email         = document.getElementById('regEmail').value.trim();
-        const phone         = document.getElementById('regPhone').value.trim();
-        const password      = document.getElementById('regPassword').value;
-        const referral_code = getReferralCode();
-
-        console.log('========================================');
-        console.log(' REGISTRATION SUBMISSION');
-        console.log('Username:', username);
-        console.log('Email:', email);
-        console.log('Phone:', phone);
-        console.log('Referral code being sent:', referral_code || '(none)');
-        console.log('========================================');
-
+        const username = document.getElementById('regUsername').value;
+        const email = document.getElementById('regEmail').value;
+        const phone = document.getElementById('regPhone').value;
+        const password = document.getElementById('regPassword').value;
+        const referral_code = getStoredReferralCode();
+        
+        const btn = document.getElementById('registerBtn');
+        
         if (!username || !email || !phone || !password) {
-            showToast('Please fill in all required fields', 'error');
+            showToast('Please fill all fields', 'error');
             return;
         }
-
+        
         const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
         if (!phoneRegex.test(phone)) {
-            showToast('Please enter a valid Kenyan phone number (e.g. 0712345678)', 'error');
+            showToast('Please enter a valid Kenyan phone number', 'error');
             return;
         }
-
-        const btn        = document.getElementById('registerBtn');
-        btn.disabled     = true;
-        btn.innerHTML    = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
-
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+        
         try {
             const requestBody = { username, email, phone, password };
-
-            // Only include referral_code if it is non-empty
-            if (referral_code && referral_code.trim() !== '') {
-                requestBody.referral_code = referral_code.trim();
+            if (referral_code && referral_code !== 'null') {
+                requestBody.referral_code = referral_code;
             }
-
-            console.log('Request body:', JSON.stringify(requestBody, null, 2));
-
+            
             const response = await fetch(`${API_BASE}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
-
+            
             const data = await response.json();
-
+            
             if (data.success) {
                 setToken(data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                showToast(data.message || 'Account created successfully!');
-
-                // Clear stored referral code after successful registration
-                sessionStorage.removeItem('referral_code');
-                window.referralCode = null;
-
-                setTimeout(() => window.location.href = 'activation.html', 1500);
+                clearStoredReferralCode();
+                showToast(data.message);
+                window.location.href = 'activation.html';
             } else {
-                showToast(data.error || 'Registration failed', 'error');
+                showToast(data.error, 'error');
             }
         } catch (error) {
             console.error('Registration error:', error);
-            showToast('Registration failed. Please check your connection and try again.', 'error');
+            showToast('Registration failed. Please try again.', 'error');
         } finally {
-            btn.disabled  = false;
-            btn.innerHTML = 'Register';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Register';
         }
     }
-
-    // ============================================
-// INITIALISE ON DOM READY
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM ready — initialising auth page');
-
-    // Wire up buttons
-    document.getElementById('loginTabBtn').onclick    = () => switchTab('login');
-    document.getElementById('registerTabBtn').onclick = () => switchTab('register');
-    document.getElementById('loginBtn').onclick       = handleLogin;
-    document.getElementById('registerBtn').onclick    = handleRegister;
-
-    // ============================================
-    // CHECK FOR REFERRAL CODE IN URL
-    // ============================================
-    const urlParams = new URLSearchParams(window.location.search);
-    const referralCodeFromUrl = urlParams.get('ref');
     
-    console.log('🔍 Checking URL for referral code:', referralCodeFromUrl);
-    
-    if (referralCodeFromUrl && referralCodeFromUrl !== 'null' && referralCodeFromUrl !== 'undefined' && referralCodeFromUrl.trim() !== '') {
-        // Store the referral code
-        sessionStorage.setItem('referral_code', referralCodeFromUrl.trim());
-        window.referralCode = referralCodeFromUrl.trim();
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('loginTabBtn').onclick = () => switchTab('login');
+        document.getElementById('registerTabBtn').onclick = () => switchTab('register');
+        document.getElementById('loginBtn').onclick = handleLogin;
+        document.getElementById('registerBtn').onclick = handleRegister;
         
-        // AUTO-SWITCH to register tab
-        switchTab('register');
-        
-        // Auto-fill the referral input field
-        const refInput = document.getElementById('regReferralCode');
-        if (refInput) {
-            refInput.value = referralCodeFromUrl.trim();
-            refInput.style.backgroundColor = '#d1fae5';
-            refInput.style.borderColor = '#10b981';
-            refInput.style.fontWeight = '500';
-            
-            const referralMessage = document.getElementById('referralMessage');
-            if (referralMessage) {
-                referralMessage.innerHTML = '<i class="fas fa-check-circle text-green-600 mr-1"></i>Referral code automatically applied! You were referred by a friend.';
-                referralMessage.className = 'text-xs text-green-600 mt-1 font-semibold';
-            }
-            
-            console.log('✅ Referral code auto-filled successfully:', referralCodeFromUrl);
+        // Show registration form if referral code is present
+        const refCode = getStoredReferralCode();
+        if (refCode) {
+            switchTab('register');
+            showToast('You were referred by a friend! Complete registration to join.', 'success');
         }
-    } else {
-        // No referral code, default to login tab
-        console.log('ℹ️ No referral code in URL, showing login tab');
-        switchTab('login');
-    }
-});
+    });
 </script>
-
 </body>
 </html>

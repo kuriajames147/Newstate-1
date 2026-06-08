@@ -1,288 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activate Account - Refer & Earn</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .hidden { display: none; }
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #10b981;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Account - Refer & Earn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Currency/Transaction themed background */
+        .activation-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=1600');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        /* Floating coins animation */
+        @keyframes floatCoins {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        
+        .floating-icon {
+            animation: floatCoins 3s ease-in-out infinite;
+        }
+        
+        /* Slide up animation */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .activation-card {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        /* Pulse animation for payment button */
+        @keyframes paymentPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+        }
+        
+        .payment-btn {
+            animation: paymentPulse 2s infinite;
+        }
+        
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Input focus effect */
+        .input-focus:focus {
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+        
+        .hidden { display: none; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
-  <div class="container mx-auto px-4 py-8">
-    <div class="max-w-md mx-auto">
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white text-center">
-          <i class="fas fa-mobile-alt text-5xl mb-3"></i>
-          <h2 class="text-2xl font-bold">Activate Your Account</h2>
-          <p class="text-green-100 mt-1" id="activationSubtitle">Loading...</p>
+<body class="activation-bg">
+
+<div class="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full">
+        <!-- Decorative floating icons -->
+        <div class="flex justify-center gap-4 mb-6">
+            <div class="floating-icon text-3xl bg-white/20 backdrop-blur p-3 rounded-full">
+                <i class="fas fa-money-bill-wave text-white"></i>
+            </div>
+            <div class="floating-icon text-3xl bg-white/20 backdrop-blur p-3 rounded-full" style="animation-delay: 0.5s;">
+                <i class="fas fa-coins text-white"></i>
+            </div>
+            <div class="floating-icon text-3xl bg-white/20 backdrop-blur p-3 rounded-full" style="animation-delay: 1s;">
+                <i class="fas fa-chart-line text-white"></i>
+            </div>
         </div>
+        
+        <!-- Activation Card -->
+        <div class="activation-card bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white text-center">
+                <i class="fas fa-key text-5xl mb-3 floating-icon"></i>
+                <h2 class="text-2xl font-bold">Activate Your Account</h2>
+                <p class="text-orange-100 mt-1">Pay Ksh 300 to start earning!</p>
+            </div>
 
-        <div class="p-6">
-          <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-            <p class="text-gray-600 text-sm">Welcome,</p>
-            <p class="text-xl font-bold text-gray-800" id="userName">Loading...</p>
-          </div>
+            <div class="p-6">
+                <!-- User Info -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg flex items-center gap-3">
+                    <i class="fas fa-user-circle text-3xl text-green-600"></i>
+                    <div>
+                        <p class="text-gray-600 text-sm">Welcome to NewstateHela</p>
+                        <p class="text-xl font-bold text-gray-800" id="userName"></p>
+                    </div>
+                </div>
 
-          <div class="text-center mb-6">
-            <div class="text-5xl font-bold text-green-600 mb-2" id="activationAmount">Loading...</div>
-            <p class="text-gray-500 text-sm">One-time activation fee</p>
-            <p class="text-xs text-gray-400 mt-1" id="commissionMessage">Loading...</p>
-          </div>
+                <!-- Payment Amount Display -->
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-full mb-2">
+                        <span class="text-3xl font-bold text-green-600">Ksh</span>
+                        <span class="text-5xl font-bold text-green-600" id="activationAmount">300</span>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-2">One-time activation fee</p>
+                </div>
 
-          <!-- M-PESA Phone Input -->
-          <div class="mb-6">
-            <label class="block text-gray-700 font-semibold mb-2">
-              <i class="fas fa-phone-alt mr-2"></i>M-PESA Phone Number
-            </label>
-            <input type="tel" id="phoneNumber" 
-                   placeholder="0712345678" 
-                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
-                   value="">
-            <p class="text-xs text-gray-500 mt-1">Enter the M-PESA registered phone number</p>
-          </div>
+                <!-- M-PESA Phone Input -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-phone-alt mr-2 text-green-600"></i>M-PESA Phone Number
+                    </label>
+                    <input type="tel" id="phoneNumber" 
+                           placeholder="0712345678" 
+                           class="input-focus w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg transition-all">
+                    <p class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>Enter the M-PESA registered phone number (e.g., 0712345678)
+                    </p>
+                </div>
 
-          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 class="font-bold text-blue-800 mb-2">How to Pay:</h3>
-            <ol class="text-sm text-blue-700 space-y-1">
-              <li>1. Enter your M-PESA phone number</li>
-              <li>2. Click the pay button below</li>
-              <li>3. Enter your M-PESA PIN on your phone</li>
-              <li>4. Account activates automatically</li>
-            </ol>
-          </div>
+                <!-- Benefits Box -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2 flex items-center gap-2">
+                        <i class="fas fa-gift"></i> After activation, you:
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="flex items-center gap-2 text-green-700">
+                            <i class="fas fa-link text-xs"></i> Access your dashboard
+                        </div>
+                        <div class="flex items-center gap-2 text-green-700">
+                            <i class="fas fa-coins text-xs"></i> Earn Ksh 120/referral
+                        </div>
+                        <div class="flex items-center gap-2 text-green-700">
+                            <i class="fas fa-money-bill-wave text-xs"></i> Start earning
+                        </div>
+                        <div class="flex items-center gap-2 text-green-700">
+                            <i class="fas fa-chart-line text-xs"></i> Withdraw Earnings
+                        </div>
+                    </div>
+                </div>
 
-          <button id="payButton" 
-                  class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 rounded-xl transition-all text-lg">
-            <i class="fas fa-money-bill-wave mr-2"></i><span id="payButtonText">Loading...</span>
-          </button>
+                <!-- Activate Button -->
+                <button id="payButton" 
+                        class="payment-btn w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 rounded-xl transition-all text-lg">
+                    <i class="fas fa-money-bill-wave mr-2"></i>Pay Ksh 300 via M-PESA
+                </button>
 
-          <div id="statusArea" class="mt-4"></div>
+                <!-- Status Area -->
+                <div id="statusArea" class="mt-4"></div>
 
-          <div class="mt-6 text-center">
-            <a href="#" id="logoutBtn" class="text-gray-500 hover:text-gray-700 text-sm">
-              <i class="fas fa-sign-out-alt mr-1"></i>Logout
-            </a>
-          </div>
+                <!-- Logout Link -->
+                <div class="mt-6 text-center">
+                    <a href="#" id="logoutBtn" class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
+        
+        <!-- Trust Badge -->
+        <div class="text-center mt-6 text-white/70 text-sm flex justify-center gap-4">
+            <span><i class="fas fa-shield-alt mr-1"></i> Secure Payment</span>
+            <span><i class="fas fa-lock mr-1"></i> SSL Encrypted</span>
+            <span><i class="fas fa-clock mr-1"></i> Instant Activation</span>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     const API_BASE = 'http://localhost:5000/api';
+    let pollingInterval = null;
     let activationAmount = 300;
-    let referralCommission = 120;
     
     function getToken() {
-      return localStorage.getItem('token');
+        return localStorage.getItem('token');
     }
     
     function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500' : 'bg-red-500'
-      } text-white`;
-      toast.innerHTML = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 5000);
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-20 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+            type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+        } text-white`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
     }
     
-    // Load settings from database
-    async function loadSettings() {
-      try {
-        const response = await fetch(`${API_BASE}/settings/public`);
-        const data = await response.json();
-        
-        if (data.success) {
-          activationAmount = parseInt(data.settings.activation_fee) || 300;
-          referralCommission = parseInt(data.settings.referral_commission) || 120;
-          
-          // Update UI with dynamic values
-          document.getElementById('activationAmount').textContent = `Ksh ${activationAmount}`;
-          document.getElementById('activationSubtitle').textContent = `Pay Ksh ${activationAmount} to start earning!`;
-          document.getElementById('payButtonText').textContent = `Pay Ksh ${activationAmount} via M-PESA`;
-          document.getElementById('commissionMessage').textContent = `Earn Ksh ${referralCommission} per referral!`;
-          
-          console.log('✅ Settings loaded - Activation amount:', activationAmount);
-        }
-      } catch (error) {
-        console.error('Error loading settings:', error);
-        // Fallback to defaults
-        document.getElementById('activationAmount').textContent = 'Ksh 300';
-        document.getElementById('payButtonText').textContent = 'Pay Ksh 300 via M-PESA';
-        document.getElementById('commissionMessage').textContent = 'Earn Ksh 120 per referral!';
-      }
-    }
-    
-    let pollingInterval = null;
-    
-    async function makePayment() {
-      const phone = document.getElementById('phoneNumber').value.trim();
-      const button = document.getElementById('payButton');
-      const statusArea = document.getElementById('statusArea');
-      const token = getToken();
-      
-      if (!phone) {
-        showToast('Please enter your M-PESA phone number', 'error');
-        return;
-      }
-      
-      const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
-      if (!phoneRegex.test(phone)) {
-        showToast('Please enter a valid Kenyan phone number (e.g., 0712345678)', 'error');
-        return;
-      }
-      
-      button.disabled = true;
-      button.innerHTML = '<span class="loading mr-2"></span>Sending STK Push...';
-      
-      statusArea.innerHTML = `
-        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg">
-          <i class="fas fa-info-circle mr-2"></i>
-          Sending payment request for Ksh ${activationAmount}...
-        </div>
-      `;
-      
-      try {
-        // Use the dynamic activationAmount
-        const response = await fetch(`${API_BASE}/payments/activate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ phone, amount: activationAmount })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast(`STK Push sent for Ksh ${activationAmount}! Check your phone`, 'success');
-          
-          statusArea.innerHTML = `
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
-              <i class="fas fa-check-circle mr-2"></i>
-              <strong>STK Push Sent!</strong>
-              <div class="mt-1">Enter your M-PESA PIN on your phone to complete payment of Ksh ${activationAmount}.</div>
-              <div class="mt-2 text-sm">
-                <span class="loading mr-2"></span>
-                Waiting for payment confirmation...
-              </div>
-            </div>
-          `;
-          
-          pollPaymentStatus(data.checkoutRequestId);
-        } else {
-          throw new Error(data.error);
-        }
-      } catch (error) {
-        console.error('Payment error:', error);
-        showToast(error.message, 'error');
-        statusArea.innerHTML = `
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            ${error.message}
-            <div class="mt-2">
-              <button onclick="location.reload()" class="bg-red-600 text-white px-3 py-1 rounded text-sm">Try Again</button>
-            </div>
-          </div>
-        `;
-        button.disabled = false;
-        button.innerHTML = `<i class="fas fa-money-bill-wave mr-2"></i>Pay Ksh ${activationAmount} via M-PESA`;
-      }
-    }
-    
-    async function pollPaymentStatus(checkoutRequestId) {
-      let attempts = 0;
-      const maxAttempts = 30;
-      const token = getToken();
-      
-      if (pollingInterval) clearInterval(pollingInterval);
-      
-      pollingInterval = setInterval(async () => {
-        attempts++;
-        
-        try {
-          const response = await fetch(`${API_BASE}/payments/status/${checkoutRequestId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const data = await response.json();
-          
-          if (data.transaction && data.transaction.status === 'completed') {
-            clearInterval(pollingInterval);
-            showToast(`Payment successful! Account activated.`, 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 2000);
-          } else if (data.transaction && data.transaction.status === 'failed') {
-            clearInterval(pollingInterval);
-            showToast('Payment failed. Please try again.', 'error');
-            document.getElementById('payButton').disabled = false;
-          } else if (attempts >= maxAttempts) {
-            clearInterval(pollingInterval);
-            document.getElementById('payButton').disabled = false;
-          }
-        } catch (error) {
-          console.error('Polling error:', error);
-        }
-      }, 5000);
+    function formatPhoneNumber(phone) {
+        let cleaned = phone.replace(/\D/g, '');
+        if (cleaned.startsWith('0')) cleaned = '254' + cleaned.substring(1);
+        if (!cleaned.startsWith('254')) cleaned = '254' + cleaned;
+        return cleaned;
     }
     
     async function loadUserInfo() {
-      const token = getToken();
-      if (!token) {
-        window.location.href = 'index.html';
-        return;
-      }
-      
-      try {
-        const response = await fetch(`${API_BASE}/auth/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        
-        if (data.user) {
-          document.getElementById('userName').textContent = data.user.username;
-          
-          if (data.user.registration_paid) {
-            showToast('Account already activated! Redirecting...', 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 2000);
-          }
+        const token = getToken();
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
         }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+        
+        try {
+            const response = await fetch(`${API_BASE}/auth/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.user) {
+                document.getElementById('userName').textContent = data.user.username;
+                
+                if (data.user.registration_paid) {
+                    showToast('Account already activated! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                }
+                
+                // Pre-fill phone if available
+                if (data.user.phone) {
+                    let displayPhone = data.user.phone;
+                    if (displayPhone.startsWith('254')) {
+                        displayPhone = '0' + displayPhone.substring(3);
+                    }
+                    document.getElementById('phoneNumber').value = displayPhone;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading user info:', error);
+            showToast('Error loading user information', 'error');
+        }
+    }
+    
+    async function requestActivationPayment() {
+        const phoneInput = document.getElementById('phoneNumber');
+        const phone = phoneInput.value.trim();
+        const payButton = document.getElementById('payButton');
+        const statusArea = document.getElementById('statusArea');
+        
+        if (!phone) {
+            showToast('Please enter your M-PESA phone number', 'error');
+            phoneInput.focus();
+            return;
+        }
+        
+        const phoneRegex = /^(?:254|0)(7|1)\d{8}$/;
+        if (!phoneRegex.test(phone)) {
+            showToast('Please enter a valid Kenyan phone number (e.g., 0712345678)', 'error');
+            phoneInput.focus();
+            return;
+        }
+        
+        payButton.disabled = true;
+        payButton.innerHTML = '<span class="loading mr-2"></span>Sending STK Push...';
+        
+        statusArea.innerHTML = `
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg">
+                <i class="fas fa-info-circle mr-2"></i>
+                Sending payment request for Ksh ${activationAmount}. Please check your phone.
+            </div>
+        `;
+        
+        try {
+            const token = getToken();
+            const formattedPhone = formatPhoneNumber(phone);
+            
+            const response = await fetch(`${API_BASE}/payments/activate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ phone: formattedPhone, amount: activationAmount })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('STK Push sent! Check your phone', 'success');
+                
+                statusArea.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <strong>STK Push Sent!</strong>
+                        <div class="mt-1">Enter your M-PESA PIN to complete payment.</div>
+                        <div class="mt-2 text-sm">
+                            <span class="loading mr-2"></span>
+                            Waiting for confirmation...
+                        </div>
+                    </div>
+                `;
+                
+                pollPaymentStatus(data.checkoutRequestId);
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            showToast(error.message, 'error');
+            statusArea.innerHTML = `
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    ${error.message}
+                    <div class="mt-2">
+                        <button onclick="location.reload()" class="bg-red-600 text-white px-3 py-1 rounded text-sm">Try Again</button>
+                    </div>
+                </div>
+            `;
+            payButton.disabled = false;
+            payButton.innerHTML = '<i class="fas fa-money-bill-wave mr-2"></i>Pay Ksh 300 via M-PESA';
+        }
+    }
+    
+    function pollPaymentStatus(checkoutRequestId) {
+        let attempts = 0;
+        const maxAttempts = 30;
+        const token = getToken();
+        
+        if (pollingInterval) clearInterval(pollingInterval);
+        
+        pollingInterval = setInterval(async () => {
+            attempts++;
+            
+            try {
+                const response = await fetch(`${API_BASE}/payments/status/${checkoutRequestId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.transaction && data.transaction.status === 'completed') {
+                    clearInterval(pollingInterval);
+                    showToast('Payment successful! Account activated.', 'success');
+                    setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                } else if (data.transaction && data.transaction.status === 'failed') {
+                    clearInterval(pollingInterval);
+                    showToast('Payment failed. Please try again.', 'error');
+                    document.getElementById('payButton').disabled = false;
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(pollingInterval);
+                    document.getElementById('payButton').disabled = false;
+                }
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+        }, 5000);
     }
     
     function logout() {
-      if (pollingInterval) clearInterval(pollingInterval);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = 'index.html';
+        if (pollingInterval) clearInterval(pollingInterval);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
     }
     
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadSettings();
-      await loadUserInfo();
-      
-      document.getElementById('payButton').onclick = makePayment;
-      document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); logout(); };
-    });
-  </script>
+    document.getElementById('payButton').onclick = requestActivationPayment;
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); logout(); };
+    
+    loadUserInfo();
+</script>
 </body>
 </html>

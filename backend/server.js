@@ -7,26 +7,12 @@ dotenv.config();
 
 const app = express();
 
-// Allow multiple origins
-const allowedOrigins = [
-    'http://localhost:5500',
-    'http://localhost:3000',
-    'https://referral-frontend.onrender.com',
-    'https://referral-backend.onrender.com'
-];
-
+// CORS configuration
 app.use(cors({
-    origin: function(origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'CORS policy does not allow access from this origin.';
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: true, // Allow all origins for testing
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middleware
@@ -61,6 +47,8 @@ app.use('/api/referrals', require('./routes/referrals'));
 app.use('/api/wallet', require('./routes/wallet'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/user', require('./routes/user'));
+
 
 console.log('✅ All routes mounted');
 console.log('   - /api/auth');
@@ -69,6 +57,7 @@ console.log('   - /api/referrals');
 console.log('   - /api/wallet');
 console.log('   - /api/admin');
 console.log('   - /api/settings');
+console.log('   - /api/user');
 // 404 handler
 app.use('*', (req, res) => {
   console.log(`❌ 404: ${req.method} ${req.url}`);

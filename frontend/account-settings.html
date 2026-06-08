@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - Refer & Earn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .settings-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .settings-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <a href="dashboard.html" class="text-green-600 hover:text-green-700 mb-2 inline-block">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800">Account Settings</h1>
+            <p class="text-gray-500 mt-1">Manage your account security and preferences</p>
+        </div>
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-shield-alt text-4xl text-white"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6">
+        <!-- Change Password -->
+        <div class="bg-white rounded-xl shadow-sm p-6 settings-card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-key mr-2 text-blue-600"></i>Change Password
+            </h2>
+            <form id="passwordForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Current Password</label>
+                    <input type="password" id="currentPassword" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">New Password</label>
+                    <input type="password" id="newPassword" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <p class="text-xs text-gray-500 mt-1">Minimum 8 characters, at least one uppercase letter and one number</p>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-save mr-2"></i>Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Two-Factor Authentication -->
+        <div class="bg-white rounded-xl shadow-sm p-6 settings-card">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-mobile-alt mr-2 text-purple-600"></i>Two-Factor Authentication (2FA)
+                </h2>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="twoFactorToggle" class="sr-only peer" onchange="toggleTwoFactor()">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-700">Enable 2FA</span>
+                </label>
+            </div>
+            <p class="text-gray-500 text-sm">Add an extra layer of security to your account with two-factor authentication.</p>
+            <div id="twoFactorSection" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm text-gray-600 mb-3">Scan this QR code with your authenticator app:</p>
+                <div id="qrCode" class="flex justify-center mb-3">
+                    <div class="w-48 h-48 bg-gray-200 flex items-center justify-center rounded-lg">
+                        <i class="fas fa-qrcode text-6xl text-gray-400"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 text-center">Use Google Authenticator or any TOTP app</p>
+            </div>
+        </div>
+
+        <!-- Notification Preferences -->
+        <div class="bg-white rounded-xl shadow-sm p-6 settings-card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-bell mr-2 text-yellow-600"></i>Notification Preferences
+            </h2>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-700">Email Notifications</p>
+                        <p class="text-sm text-gray-500">Receive updates about your referrals and earnings</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="emailNotifications" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-700">SMS Notifications</p>
+                        <p class="text-sm text-gray-500">Get SMS alerts for withdrawals and payments</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="smsNotifications" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transaction-all peer-checked:bg-green-600"></div>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-700">Referral Updates</p>
+                        <p class="text-sm text-gray-500">Get notified when someone registers using your link</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="referralNotifications" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="saveNotificationPreferences()" class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+                    <i class="fas fa-save mr-2"></i>Save Preferences
+                </button>
+            </div>
+        </div>
+
+        <!-- Session Management -->
+        <div class="bg-white rounded-xl shadow-sm p-6 settings-card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-laptop mr-2 text-red-600"></i>Active Sessions
+            </h2>
+            <div id="sessionsList" class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-laptop text-gray-500"></i>
+                        <div>
+                            <p class="font-medium text-gray-700">Current Session</p>
+                            <p class="text-xs text-gray-500">Chrome on Windows</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-green-600">Active now</span>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="logoutAllDevices()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout All Devices
+                </button>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+            <h2 class="text-xl font-bold text-red-700 mb-2">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Danger Zone
+            </h2>
+            <p class="text-red-600 text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+            <button onclick="confirmDeleteAccount()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                <i class="fas fa-trash-alt mr-2"></i>Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:5000/api';
+    
+    function getToken() {
+        return localStorage.getItem('token');
+    }
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-lg shadow-lg`;
+        toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // Change Password
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (newPassword !== confirmPassword) {
+            showToast('New passwords do not match', 'error');
+            return;
+        }
+        
+        if (newPassword.length < 8) {
+            showToast('Password must be at least 8 characters', 'error');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/user/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Password changed successfully!');
+                document.getElementById('passwordForm').reset();
+            } else {
+                showToast(data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error changing password', 'error');
+        }
+    });
+    
+    // Two-Factor Authentication
+    function toggleTwoFactor() {
+        const toggle = document.getElementById('twoFactorToggle');
+        const section = document.getElementById('twoFactorSection');
+        
+        if (toggle.checked) {
+            section.classList.remove('hidden');
+            // Generate QR code logic here
+        } else {
+            section.classList.add('hidden');
+        }
+    }
+    
+    // Notification Preferences
+    async function saveNotificationPreferences() {
+        const preferences = {
+            email: document.getElementById('emailNotifications').checked,
+            sms: document.getElementById('smsNotifications').checked,
+            referral: document.getElementById('referralNotifications').checked
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE}/user/notifications`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify(preferences)
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Notification preferences saved!');
+            } else {
+                showToast(data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error saving preferences', 'error');
+        }
+    }
+    
+    async function logoutAllDevices() {
+        if (confirm('This will log you out from all devices. Are you sure?')) {
+            try {
+                const response = await fetch(`${API_BASE}/user/logout-all`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Logged out from all devices');
+                    localStorage.removeItem('token');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                }
+            } catch (error) {
+                showToast('Error logging out devices', 'error');
+            }
+        }
+    }
+    
+    function confirmDeleteAccount() {
+        if (confirm('WARNING: This action is irreversible. All your data including referrals, earnings, and account information will be permanently deleted. Are you absolutely sure?')) {
+            const password = prompt('Please enter your password to confirm account deletion:');
+            if (password) {
+                deleteAccount(password);
+            }
+        }
+    }
+    
+    async function deleteAccount(password) {
+        try {
+            const response = await fetch(`${API_BASE}/user/delete-account`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({ password })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Account deleted successfully');
+                localStorage.removeItem('token');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            } else {
+                showToast(data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error deleting account', 'error');
+        }
+    }
+    
+    // Load notification preferences
+    async function loadNotificationPreferences() {
+        try {
+            const response = await fetch(`${API_BASE}/user/notifications`, {
+                headers: { 'Authorization': `Bearer ${getToken()}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('emailNotifications').checked = data.preferences.email;
+                document.getElementById('smsNotifications').checked = data.preferences.sms;
+                document.getElementById('referralNotifications').checked = data.preferences.referral;
+            }
+        } catch (error) {
+            console.error('Error loading preferences:', error);
+        }
+    }
+    
+    loadNotificationPreferences();
+</script>
+</body>
+</html>
