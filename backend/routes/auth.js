@@ -3,8 +3,12 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { authenticate } = require('../middleware/auth');
 const { validateRegistration, validateLogin } = require('../middleware/validate');
 const router = express.Router();
+const { createNotification } = require('./notifications');
+const earningsService = require('../services/earningsService');
+
 
 // ============================================
 // HELPERS
@@ -19,8 +23,8 @@ const generateReferralCode = () => {
 const formatPhoneNumber = (phone) => {
     if (!phone) return null;
     let cleaned = phone.toString().replace(/\D/g, '');
-    if (cleaned.startsWith('0'))        cleaned = '254' + cleaned.substring(1);
-    else if (cleaned.startsWith('+'))   cleaned = cleaned.substring(1);
+    if (cleaned.startsWith('0')) cleaned = '254' + cleaned.substring(1);
+    else if (cleaned.startsWith('+')) cleaned = cleaned.substring(1);
     else if (!cleaned.startsWith('254')) cleaned = '254' + cleaned;
     return cleaned;
 };
@@ -55,11 +59,11 @@ router.post('/register', validateRegistration, async (req, res) => {
         }
 
         // ── 2. Hash password & generate this user's referral code ─
-        const hashedPassword  = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const newReferralCode = generateReferralCode();
 
         // ── 3. Resolve referrer ───────────────────────────────────
-        let referrerId    = null;
+        let referrerId = null;
         let referredByCode = null;
 
         // Sanitise the incoming code — treat blank / whitespace as absent
@@ -72,7 +76,7 @@ router.post('/register', validateRegistration, async (req, res) => {
             );
 
             if (refUser.rows.length > 0) {
-                referrerId     = refUser.rows[0].id;
+                referrerId = refUser.rows[0].id;
                 referredByCode = sanitisedCode;
                 console.log(`✅ Referrer resolved: ${refUser.rows[0].username} (ID: ${referrerId})`);
             } else {
@@ -84,7 +88,6 @@ router.post('/register', validateRegistration, async (req, res) => {
         }
 
         // ── 4. Insert new user ────────────────────────────────────
-        // FIX: Added placeholders $7 and $8 to match the 8 array values below
         const result = await pool.query(
             `INSERT INTO users
                  (username, email, phone, password, referral_code, referred_by_code, is_active, registration_paid)
@@ -96,19 +99,16 @@ router.post('/register', validateRegistration, async (req, res) => {
                 formattedPhone,
                 hashedPassword,
                 newReferralCode,
-                referredByCode,   // NULL if no valid referrer found
-                false,            // Maps to $7 (is_active)
-                false             // Maps to $8 (registration_paid)
+                referredByCode,
+                false,  // is_active
+                false   // registration_paid
             ]
         );
 
-        // FIX: Uncommented this so lower lines can access newUser.id without crashing
         const newUser = result.rows[0];
         console.log(`👤 User inserted — ID: ${newUser.id}, referred_by_code: ${newUser.referred_by_code || 'none'}`);
 
         // ── 5. Create pending referral record ─────────────────────
-        // Status becomes 'completed' (and commission is credited) once
-        // the new user pays the activation fee (handled in payments route).
         if (referrerId) {
             // Fetch commission amount from system settings (default 120)
             const commissionResult = await pool.query(
@@ -130,6 +130,24 @@ router.post('/register', validateRegistration, async (req, res) => {
             );
 
             console.log(`✅ Pending referral created: referrer ${referrerId} → new user ${newUser.id} (commission: ${commission})`);
+
+            // ============================================
+            // CREATE NOTIFICATION FOR REFERRER
+            // MOVED INSIDE THE REGISTER FUNCTION - THIS IS THE FIX!
+            // ============================================
+            const referrerResult = await pool.query(
+                'SELECT username FROM users WHERE id = $1',
+                [referrerId]
+            );
+            const referrerName = referrerResult.rows[0]?.username || 'Someone';
+            
+            await createNotification(
+                referrerId,
+                'new_referral_registration',
+                'New Referral Registered! 🎉',
+                `${username} just registered using your referral link! They'll need to pay Ksh 300 to activate their account.`,
+                { referred_user: username, referred_id: newUser.id, status: 'pending_payment' }
+            );
         } else {
             console.log('ℹ️  No referral record created');
         }
@@ -180,7 +198,7 @@ router.post('/login', validateLogin, async (req, res) => {
             return res.status(401).json({ success: false, error: 'Invalid email or password' });
         }
 
-        const user            = result.rows[0];
+        const user = result.rows[0];
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
@@ -207,6 +225,32 @@ router.post('/login', validateLogin, async (req, res) => {
     } catch (err) {
         console.error('❌ Login error:', err.message, err.stack);
         return res.status(500).json({ success: false, error: 'Login failed. Please try again.' });
+    }
+});
+
+
+// backend/routes/auth.js - Add this if missing
+
+router.get('/me', authenticate, async (req, res) => {
+    try {
+        console.log('👤 Fetching user profile for ID:', req.user.id);
+        
+        const result = await pool.query(
+            `SELECT id, username, email, phone, role, is_active, referral_code, 
+                    wallet_balance, total_earnings, created_at 
+             FROM users WHERE id = $1`,
+            [req.user.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        console.log('✅ User profile fetched:', result.rows[0].username);
+        res.json({ user: result.rows[0] });
+    } catch (error) {
+        console.error('❌ Error fetching user:', error);
+        res.status(500).json({ error: 'Failed to fetch user data' });
     }
 });
 
