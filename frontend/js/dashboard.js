@@ -2239,6 +2239,23 @@ function isValidPhone(phone) {
     return withoutPrefix.length === 9 && /^[17]\d{8}$/.test(withoutPrefix);
 }
 
+function closeVideoModal() {
+    const modal = document.getElementById('videoModal');
+
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+
+    const player = document.getElementById('videoPlayer');
+
+    if (player) {
+        player.src = '';
+    }
+
+    document.body.style.overflow = 'auto';
+}
+
 // Process deposit
 async function processDeposit() {
     console.log('💰 Processing deposit...');
